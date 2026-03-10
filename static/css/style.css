@@ -1,0 +1,7 @@
+body { background: #f4f6f9; }
+.login-page { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, #e9f2ff, #f8fbff); }
+.login-card { max-width: 460px; margin: 60px auto; border: 0; border-radius: 18px; }
+.card { border: 0; border-radius: 16px; }
+.card-header { background: #fff; border-bottom: 1px solid #edf0f4; font-weight: 600; }
+.table { background: #fff; }
+.badge { font-size: 0.85rem; }

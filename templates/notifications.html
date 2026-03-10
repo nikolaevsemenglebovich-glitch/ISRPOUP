@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3">Уведомления</h2>
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% for item in notifications %}
+            <div class="border rounded p-3 mb-2 {% if not item.is_read %}bg-light{% endif %}">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div>{{ item.message }}</div>
+                        <div class="small text-muted">{{ item.created_at }}</div>
+                    </div>
+                    {% if not item.is_read %}
+                    <a href="{{ url_for('read_notification', notification_id=item.notification_id) }}" class="btn btn-sm btn-outline-primary">Прочитано</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="text-muted">Уведомлений нет.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

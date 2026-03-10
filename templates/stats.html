@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3">Статистика</h2>
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm text-center p-4">
+            <div class="small text-muted">Количество выполненных заявок</div>
+            <div class="display-6">{{ completed_count or 0 }}</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm text-center p-4">
+            <div class="small text-muted">Среднее время выполнения</div>
+            <div class="display-6">{{ avg_days or 0 }} дн.</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">По видам техники</div>
+            <div class="card-body">
+                <table class="table">
+                    <tr><th>Тип</th><th>Количество</th></tr>
+                    {% for item in by_type %}
+                    <tr><td>{{ item.homeTechType }}</td><td>{{ item.total }}</td></tr>
+                    {% else %}
+                    <tr><td colspan="2" class="text-muted">Нет данных</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">По статусам</div>
+            <div class="card-body">
+                <table class="table">
+                    <tr><th>Статус</th><th>Количество</th></tr>
+                    {% for item in by_status %}
+                    <tr><td>{{ item.requestStatus }}</td><td>{{ item.total }}</td></tr>
+                    {% else %}
+                    <tr><td colspan="2" class="text-muted">Нет данных</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

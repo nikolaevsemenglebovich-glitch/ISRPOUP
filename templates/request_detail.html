@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h2 class="mb-0">Заявка №{{ request_data.requestID }}</h2>
+        <div class="text-muted">{{ request_data.homeTechType }} / {{ request_data.homeTechModel }}</div>
+    </div>
+    <a href="{{ url_for('requests_list') }}" class="btn btn-outline-secondary">К списку</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">Основные данные</div>
+            <div class="card-body">
+                <div class="mb-2"><strong>Заказчик:</strong> {{ request_data.client_name or ('ID ' ~ request_data.clientID) }}</div>
+                <div class="mb-2"><strong>Телефон:</strong> {{ request_data.client_phone or '—' }}</div>
+                <div class="mb-2"><strong>Статус:</strong> <span class="badge text-bg-secondary">{{ request_data.requestStatus }}</span></div>
+                <div class="mb-2"><strong>Ответственный мастер:</strong> {{ request_data.master_name or 'Не назначен' }}</div>
+                <div class="mb-2"><strong>Дата заявки:</strong> {{ request_data.startDate }}</div>
+                <div class="mb-2"><strong>Дата завершения:</strong> {{ request_data.completionDate or '—' }}</div>
+                <div class="mb-2"><strong>Запчасти и материалы:</strong> {{ request_data.repairParts or '—' }}</div>
+                <div class="mt-3 p-3 bg-light rounded">{{ request_data.problemDescryption }}</div>
+            </div>
+        </div>
+
+        {% if current_role in ['Оператор', 'Менеджер'] %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">Редактирование заявки</div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('edit_request', request_id=request_data.requestID) }}">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <input type="date" name="startDate" class="form-control" value="{{ request_data.startDate }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <input name="homeTechType" class="form-control" value="{{ request_data.homeTechType }}" required>
+                        </div>
+                        <div class="col-md-5">
+                            <input name="homeTechModel" class="form-control" value="{{ request_data.homeTechModel }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <select name="clientID" class="form-select" required>
+                                {% for client in clients %}
+                                <option value="{{ client.userID }}" {% if request_data.clientID == client.userID %}selected{% endif %}>{{ client.fio }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <textarea name="problemDescryption" class="form-control" rows="3" required>{{ request_data.problemDescryption }}</textarea>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary mt-3">Сохранить изменения</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">Комментарии мастеров</div>
+            <div class="card-body">
+                {% if current_role == 'Мастер' %}
+                <form method="post" action="{{ url_for('add_comment', request_id=request_data.requestID) }}" class="mb-4">
+                    <textarea name="message" class="form-control mb-2" rows="3" placeholder="Комментарий по ремонту"></textarea>
+                    <input name="repairParts" class="form-control mb-2" placeholder="Запчасти и материалы (если есть)">
+                    <button class="btn btn-success">Добавить</button>
+                </form>
+                {% endif %}
+                {% for comment in comments %}
+                    <div class="border rounded p-3 mb-2">
+                        <div class="small text-muted">{{ comment.master_name }} · комментарий №{{ comment.commentID }}</div>
+                        <div>{{ comment.message }}</div>
+                    </div>
+                {% else %}
+                    <div class="text-muted">Комментариев пока нет.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">Смена статуса</div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('update_status', request_id=request_data.requestID) }}" class="d-flex gap-2">
+                    <select name="status" class="form-select">
+                        {% for st in status_list %}
+                        <option value="{{ st }}" {% if st == request_data.requestStatus %}selected{% endif %}>{{ st }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-warning">Обновить</button>
+                </form>
+            </div>
+        </div>
+
+        {% if current_role in ['Оператор', 'Менеджер'] %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">Назначение мастера</div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('assign_master', request_id=request_data.requestID) }}" class="d-flex gap-2">
+                    <select name="master_id" class="form-select">
+                        <option value="">Не назначен</option>
+                        {% for master in masters %}
+                        <option value="{{ master.userID }}" {% if request_data.masterID == master.userID %}selected{% endif %}>{{ master.fio }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-primary">Назначить</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header">QR-код отзыва</div>
+            <div class="card-body">
+                <a href="{{ url_for('generate_qr', request_id=request_data.requestID) }}" class="btn btn-success">Скачать QR</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

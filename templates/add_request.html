@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3">Новая заявка</h2>
+<form method="post" class="card card-body shadow-sm">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Дата заявки</label>
+            <input type="date" name="startDate" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Вид техники</label>
+            <input name="homeTechType" class="form-control" required>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">Модель</label>
+            <input name="homeTechModel" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Заказчик</label>
+            <select name="clientID" class="form-select" required>
+                {% for client in clients %}
+                <option value="{{ client.userID }}">{{ client.fio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Мастер</label>
+            <select name="masterID" class="form-select">
+                <option value="">Не назначать сразу</option>
+                {% for master in masters %}
+                <option value="{{ master.userID }}">{{ master.fio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Описание проблемы</label>
+            <textarea name="problemDescryption" class="form-control" rows="4" required></textarea>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Запчасти</label>
+            <input name="repairParts" class="form-control">
+        </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-success">Сохранить</button>
+        <a href="{{ url_for('requests_list') }}" class="btn btn-outline-secondary">Назад</a>
+    </div>
+</form>
+{% endblock %}
