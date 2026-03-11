@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            /* Устанавливаем Flexbox на body для центрирования всего содержимого */
+            display: flex;
+            flex-direction: column; /* Элементы располагаются вертикально */
+            align-items: center; /* Центрирование по горизонтали */
+            min-height: 100vh; /* Минимальная высота - вся видимая область */
+            margin: 0;
+            background-color: #f8f8f8; /* Светлый фон, как на макете */
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            /* Заголовок "Вход для админа" */
+            align-self: flex-start; /* Прижать заголовок к левому краю */
+            width: 100%;
+            padding: 20px 40px; /* Отступы от края */
+            box-sizing: border-box;
+            margin-top: 0;
+            font-size: 24px;
+        }
+
+        /* Контейнер для центрирования формы отдельно от заголовка */
+        .login-container {
+            flex-grow: 1; /* Позволяет контейнеру занять всё оставшееся вертикальное пространство */
+            display: flex;
+            justify-content: center; /* Центрирование формы по горизонтали */
+            align-items: center; /* Центрирование формы по вертикали */
+            width: 100%;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Фиксированная ширина, как на макете */
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            background-color: #ffc800; /* Желтая кнопка */
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Вход для админа</h1>
+
+    <div class="login-container">
+        <form method="POST">
+            <label>Логин:</label>
+            <input type="text" name="login" value="admin"> <label>Пароль:</label>
+            <input type="password" name="password" value="......"> <button type="submit">Войти</button>
+        </form>
+    </div>
+</body>
+</html>

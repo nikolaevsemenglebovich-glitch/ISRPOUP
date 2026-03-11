@@ -1,0 +1,181 @@
+Index: DIPLOM/.idea/.gitignore
+===================================================================
+diff --git a/DIPLOM/.idea/.gitignore b/DIPLOM/.idea/.gitignore
+deleted file mode 100644
+--- a/DIPLOM/.idea/.gitignore	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ /dev/null	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
+@@ -1,8 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml
+Index: DIPLOM/.idea/modules.xml
+===================================================================
+diff --git a/DIPLOM/.idea/modules.xml b/DIPLOM/.idea/modules.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/modules.xml	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ /dev/null	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectModuleManager">
+-    <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/coffee_app.iml" filepath="$PROJECT_DIR$/.idea/coffee_app.iml" />
+-    </modules>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: DIPLOM/.idea/coffee_app.iml
+===================================================================
+diff --git a/DIPLOM/.idea/coffee_app.iml b/DIPLOM/.idea/coffee_app.iml
+deleted file mode 100644
+--- a/DIPLOM/.idea/coffee_app.iml	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ /dev/null	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
+@@ -1,10 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="PYTHON_MODULE" version="4">
+-  <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$">
+-      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+-    </content>
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: DIPLOM/.idea/inspectionProfiles/profiles_settings.xml
+===================================================================
+diff --git a/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml b/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ /dev/null	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
+@@ -1,6 +0,0 @@
+-<component name="InspectionProjectProfileManager">
+-  <settings>
+-    <option name="USE_PROJECT_PROFILE" value="false" />
+-    <version value="1.0" />
+-  </settings>
+-</component>
+\ No newline at end of file
+Index: DIPLOM/.idea/misc.xml
+===================================================================
+diff --git a/DIPLOM/.idea/misc.xml b/DIPLOM/.idea/misc.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/misc.xml	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ /dev/null	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="Black">
+-    <option name="sdkName" value="Python 3.12 (coffee_app)" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (coffee_app)" project-jdk-type="Python SDK" />
+-</project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"15a4ede1-88dd-4d6c-bf40-597026234aa5\" name=\"Changes\" comment=\"ОТЧЕТ\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GithubPullRequestsUISettings\"><![CDATA[{\r\n  \"selectedUrlAndAccountId\": {\r\n    \"url\": \"https://github.com/nikolaevsemenglebovich-glitch/ISRPOUP.git\",\r\n    \"accountId\": \"6b7618b8-b29d-4410-b19f-494a13f37dca\"\r\n  }\r\n}]]></component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 8\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3AljTGg4lpwRtd1wHFK38lFjhjL\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Python.app.executor\": \"Run\",\r\n    \"Python.import_data.executor\": \"Run\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"git-widget-placeholder\": \"new-branch\",\r\n    \"last_opened_file_path\": \"C:/Users/Семён/OneDrive/Рабочий стол/ISRPOUP/ISRPOUP\",\r\n    \"settings.editor.selected.configurable\": \"com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\Семён\\OneDrive\\Рабочий стол\\ISRPOUP\\ISRPOUP\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Python.import_data\">\r\n    <configuration name=\"app\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ISRPOUP\" />\r\n      <option name=\"ENV_FILES\" value=\"\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/app.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"import_data\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"ISRPOUP\" />\r\n      <option name=\"ENV_FILES\" value=\"\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/import_data.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Python.import_data\" />\r\n        <item itemvalue=\"Python.app\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"15a4ede1-88dd-4d6c-bf40-597026234aa5\" name=\"Changes\" comment=\"\" />\r\n      <created>1773174056559</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1773174056559</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"ОТЧЕТ\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1773266370884</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1773266370884</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"2\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"ОТЧЕТ\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"ОТЧЕТ\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 1239c77a653ca21cdad015704be34b8d4a9c4f12)
++++ b/.idea/workspace.xml	(date 1773267383140)
+@@ -4,7 +4,10 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="15a4ede1-88dd-4d6c-bf40-597026234aa5" name="Changes" comment="ОТЧЕТ" />
++    <list default="true" id="15a4ede1-88dd-4d6c-bf40-597026234aa5" name="Changes" comment="Наработки по диплому">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/DIPLOM/serviceAccountKey.json" beforeDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -13,6 +16,12 @@
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
++  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
++  "lastFilter": {
++    "state": "OPEN",
++    "assignee": "nikolaevsemenglebovich-glitch"
++  }
++}]]></component>
+   <component name="GithubPullRequestsUISettings"><![CDATA[{
+   "selectedUrlAndAccountId": {
+     "url": "https://github.com/nikolaevsemenglebovich-glitch/ISRPOUP.git",
+@@ -119,11 +128,64 @@
+       <option name="project" value="LOCAL" />
+       <updated>1773266370884</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="ОТЧЕТ">
++      <option name="closed" value="true" />
++      <created>1773266512280</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1773266512280</updated>
++    </task>
++    <task id="LOCAL-00003" summary="Наработки по диплому">
++      <option name="closed" value="true" />
++      <created>1773267080008</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1773267080008</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
++  </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="OPEN_GENERIC_TABS">
++      <map>
++        <entry key="917be64f-eb0b-4d25-871f-d200d2ebf601" value="TOOL_WINDOW" />
++      </map>
++    </option>
++    <option name="TAB_STATES">
++      <map>
++        <entry key="917be64f-eb0b-4d25-871f-d200d2ebf601">
++          <value>
++            <State>
++              <option name="FILTERS">
++                <map>
++                  <entry key="branch">
++                    <value>
++                      <list>
++                        <option value="HEAD" />
++                      </list>
++                    </value>
++                  </entry>
++                  <entry key="structure">
++                    <value>
++                      <list>
++                        <option value="dir:C:/Users/Семён/OneDrive/Рабочий стол/ISRPOUP/ISRPOUP/DIPLOM" />
++                      </list>
++                    </value>
++                  </entry>
++                </map>
++              </option>
++              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
++            </State>
++          </value>
++        </entry>
++      </map>
++    </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="ОТЧЕТ" />
+-    <option name="LAST_COMMIT_MESSAGE" value="ОТЧЕТ" />
++    <MESSAGE value="Наработки по диплому" />
++    <option name="LAST_COMMIT_MESSAGE" value="Наработки по диплому" />
+   </component>
+ </project>
+\ No newline at end of file

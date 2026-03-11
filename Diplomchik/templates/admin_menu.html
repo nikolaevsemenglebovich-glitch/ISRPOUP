@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Админка — Управление</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <h1>Админка — Управление</h1>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="{{ url_for('admin_orders') }}">Заказы</a>
+        <a href="/logout">Выйти</a>
+    </nav>
+</header>
+<main>
+
+    <div class="section-card">
+        <h2>Управление товарами ☕</h2>
+
+        <!-- Форма добавления товара -->
+        <form method="POST" style="margin-bottom:20px; max-width:480px;">
+            <input name="name" placeholder="Название" required>
+            <input name="price" type="number" placeholder="Цена" required>
+            <input name="category" placeholder="Категория" required>
+            <button type="submit">Добавить товар</button>
+        </form>
+
+        <div class="menu-admin">
+            {% if menu %}
+                {% for key, item in menu.items() %}
+                <div class="card-admin">
+                    <h3>{{ item.name }}</h3>
+                    <p>Категория: {{ item.category }}</p>
+                    <p>Цена: {{ item.price }}₽</p>
+                    <button onclick="window.location.href='{{ url_for('edit_item', item_id=key) }}'">Редактировать</button>
+                    <button class="delete-btn" onclick="deleteItem('{{ key }}', '{{ item.name }}')">Удалить</button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Нет товаров в меню.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="section-card">
+        <h2>Короткий обзор заказов</h2>
+        <p>Всего заказов: <strong>{{ orders|length }}</strong></p>
+        <p><a href="{{ url_for('admin_orders') }}">Перейти к полному списку заказов</a></p>
+    </div>
+
+    <hr>
+
+    <div class="section-card">
+        <h2>Список пользователей 👥</h2>
+        {% if users %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>Имя</th><th>Email</th><th>Телефон</th><th>Роль</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>{{ u.id }}</td>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.phone }}</td>
+                    <td>{{ u.role }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Нет зарегистрированных пользователей.</p>
+        {% endif %}
+    </div>
+
+</main>
+
+<script>
+function deleteItem(id, name){
+    if(confirm(`Удалить товар "${name}" (${id})?`)){
+        fetch('{{ url_for("delete_item", item_id="__ID__") }}'.replace('__ID__', id), { method: "POST" })
+        .then(res => {
+            if(res.ok) location.reload();
+            else alert('Ошибка при удалении');
+        }).catch(e => alert('Сеть: ' + e));
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Бариста — Заказы</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <h1>Бариста — Заказы</h1>
+    <nav>
+        <a href="/">Главная</a>
+        <a href="/logout">Выйти</a>
+    </nav>
+</header>
+
+<main>
+    <h2>Текущие заказы</h2>
+
+    <table class="orders-table" id="orders-table">
+        <thead>
+            <tr>
+                <th>Номер</th>
+                <th>Время</th>
+                <th>Состав</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody id="orders-tbody">
+        {% for o in orders %}
+            <tr class="order-row status-{{ o.status }}" data-id="{{ o.id }}">
+                <td><strong>{{ o.id.split('_')[-1] }}</strong></td>
+                <td>{{ o.datetime }}</td>
+                <td>
+                    <ul style="margin:0; padding-left:16px;">
+                    {% for k, it in o.get("items", {}).items() %}
+                        <li>{{ it.name }} × {{ it.quantity }} ({{ it.price }}₽)</li>
+                    {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ o.total }} ₽</td>
+                <td><span class="status-{{ o.status }}">{{ o.status.replace('_',' ').capitalize() }}</span></td>
+                <td>
+                    {% if o.status != 'completed' %}
+                    <form method="POST" action="{{ url_for('barista_change_status', order_id=o.id) }}">
+                        {% if o.status == 'new' %}
+                            <input type="hidden" name="status" value="in_progress">
+                            <button type="submit">Начать</button>
+                        {% elif o.status == 'in_progress' %}
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit">Готово</button>
+                        {% endif %}
+                    </form>
+                    {% else %}
+                        <span>Завершён</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</main>
+
+<script>
+// функция, которая получает заказы JSON и перерисовывает tbody
+async function fetchAndRenderOrders(){
+    try {
+        const res = await fetch('{{ url_for("api_barista_orders") }}', { cache: "no-store" });
+        if(!res.ok) {
+            // если 401 — перенаправляем на логин
+            if(res.status === 401) window.location.href = "{{ url_for('login_barista') }}";
+            return;
+        }
+        const data = await res.json();
+        if(!data.ok) return;
+        const orders = data.orders || [];
+        const tbody = document.getElementById('orders-tbody');
+        if(!tbody) return;
+        let html = '';
+        for(const o of orders){
+            html += `<tr class="order-row status-${o.status}" data-id="${o.id}">
+                <td><strong>${o.id.split('_').pop()}</strong></td>
+                <td>${o.datetime || ''}</td>
+                <td><ul style="margin:0; padding-left:16px;">`;
+            for(const k in o.items){
+                const it = o.items[k];
+                html += `<li>${it.name} × ${it.quantity} (${it.price}₽)</li>`;
+            }
+            html += `</ul></td>
+                <td>${o.total} ₽</td>
+                <td><span class="status-${o.status}">${o.status.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase())}</span></td>
+                <td>`;
+            if(o.status !== 'completed'){
+                if(o.status === 'new'){
+                    html += `<form method="POST" action="/barista/orders/${o.id}/status"><input type="hidden" name="status" value="in_progress"><button type="submit">Начать</button></form>`;
+                } else if(o.status === 'in_progress'){
+                    html += `<form method="POST" action="/barista/orders/${o.id}/status"><input type="hidden" name="status" value="completed"><button type="submit">Готово</button></form>`;
+                } else {
+                    html += `<span>Обновить</span>`;
+                }
+            } else {
+                html += `<span>Завершён</span>`;
+            }
+            html += `</td></tr>`;
+        }
+        tbody.innerHTML = html;
+    } catch (err) {
+        console.error('Ошибка при обновлении заказов', err);
+    }
+}
+
+// первичная загрузка уже есть от сервера, но запустим обновление через 1с
+setTimeout(fetchAndRenderOrders, 1000);
+// и дальше опрашиваем каждые 5 секунд
+setInterval(fetchAndRenderOrders, 5000);
+</script>
+
+</body>
+</html>

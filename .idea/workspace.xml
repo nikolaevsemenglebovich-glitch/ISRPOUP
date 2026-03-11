@@ -4,21 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15a4ede1-88dd-4d6c-bf40-597026234aa5" name="Changes" comment="ОТЧЕТ" />
+    <list default="true" id="15a4ede1-88dd-4d6c-bf40-597026234aa5" name="Changes" comment="Наработки дипломf" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="origin/new-branch" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/nikolaevsemenglebovich-glitch/ISRPOUP.git",
-    "accountId": "6b7618b8-b29d-4410-b19f-494a13f37dca"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;nikolaevsemenglebovich-glitch&quot;
   }
-}]]></component>
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/nikolaevsemenglebovich-glitch/ISRPOUP.git&quot;,
+    &quot;accountId&quot;: &quot;6b7618b8-b29d-4410-b19f-494a13f37dca&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -28,16 +37,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.app.executor": "Run",
-    "Python.import_data.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "new-branch",
-    "last_opened_file_path": "C:/Users/Семён/OneDrive/Рабочий стол/ISRPOUP/ISRPOUP",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.import_data.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;new-branch&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Семён/OneDrive/Рабочий стол/ISRPOUP/ISRPOUP&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Семён\OneDrive\Рабочий стол\ISRPOUP\ISRPOUP" />
@@ -119,11 +128,94 @@
       <option name="project" value="LOCAL" />
       <updated>1773266370884</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="ОТЧЕТ">
+      <option name="closed" value="true" />
+      <created>1773266512280</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1773266512280</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Наработки по диплому">
+      <option name="closed" value="true" />
+      <created>1773267080008</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1773267080008</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Наработки по диплому">
+      <option name="closed" value="true" />
+      <created>1773267452798</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1773267452798</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Наработки по диплому">
+      <option name="closed" value="true" />
+      <created>1773267544025</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1773267544025</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Наработки дипломf">
+      <option name="closed" value="true" />
+      <created>1773268461024</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1773268461024</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="917be64f-eb0b-4d25-871f-d200d2ebf601" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="917be64f-eb0b-4d25-871f-d200d2ebf601">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:C:/Users/Семён/OneDrive/Рабочий стол/ISRPOUP/ISRPOUP/DIPLOM" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ОТЧЕТ" />
-    <option name="LAST_COMMIT_MESSAGE" value="ОТЧЕТ" />
+    <MESSAGE value="Наработки по диплому" />
+    <MESSAGE value="Наработки дипломf" />
+    <option name="LAST_COMMIT_MESSAGE" value="Наработки дипломf" />
   </component>
 </project>

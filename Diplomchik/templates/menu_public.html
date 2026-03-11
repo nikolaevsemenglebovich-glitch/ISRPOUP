@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Кофе с собой - Меню</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f5f0; margin:0; padding:0;}
+        header { background: #f7c948; padding: 15px 20px; display:flex; justify-content:space-between; align-items:center; color:white;}
+        header h1 { margin:0; font-size:24px; }
+        header nav a { color:white; margin-left:15px; text-decoration:none; font-weight:bold; }
+
+        .menu { display:flex; flex-wrap:wrap; justify-content:center; padding:20px; }
+        .card { background:white; border-radius:10px; margin:10px; padding:15px; width:200px; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+        .card h3 { margin:0; }
+        .card button { margin-top:10px; background:#f7c948; border:none; padding:8px; border-radius:5px; cursor:pointer; }
+
+        #cart { position:fixed; top:80px; right:20px; background:white; padding:15px; border-radius:10px; width:250px; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+        #cart h2 { margin-top:0; }
+        #cart ul { list-style:none; padding:0; }
+        #cart button { background:#f76c5e; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; width:100%; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Кофе с собой</h1>
+    <nav>
+        <a href="/login">Вход для админа</a>
+        <a href="/login_barista">Вход для баристы</a>
+    </nav>
+</header>
+
+<div class="menu">
+    {% for key, item in menu.items() %}
+    <div class="card">
+        <h3>{{ item.name }}</h3>
+        <p>Категория: {{ item.category }}</p>
+        <p>Цена: {{ item.price }}₽</p>
+        <button onclick="addToCart('{{ key }}', '{{ item.name }}', {{ item.price }})">Добавить в корзину</button>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="cart">
+    <h2>Корзина</h2>
+    <ul id="cart-items"></ul>
+    <p>Итого: <span id="total">0</span>₽</p>
+    <button onclick="checkout()">Оформить заказ</button>
+</div>
+
+
+<script>
+let cart = {};
+
+function addToCart(id, name, price){
+    if(cart[id]) cart[id].quantity++;
+    else cart[id] = {name:name, price:price, quantity:1};
+    renderCart();
+}
+
+function renderCart(){
+    const ul = document.getElementById('cart-items');
+    ul.innerHTML = '';
+    let total = 0;
+    for(let id in cart){
+        const item = cart[id];
+        total += item.price * item.quantity;
+        ul.innerHTML += `<li>${item.name} x ${item.quantity} <button onclick="removeItem('${id}')">❌</button></li>`;
+    }
+    document.getElementById('total').innerText = total;
+}
+
+function removeItem(id){
+    delete cart[id];
+    renderCart();
+}
+
+function checkout(){
+    if(Object.keys(cart).length === 0){
+        alert("Корзина пуста!");
+        return;
+    }
+
+    fetch("/create_order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cart)
+    }).then(res => res.text())
+      .then(msg => {
+          alert(msg);
+          cart = {};
+          renderCart();
+      });
+
+}
+
+</script>
+
+</body>
+</html>

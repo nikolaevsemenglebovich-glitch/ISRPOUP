@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать товар</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <h1>Редактировать товар</h1>
+    <nav><a href="{{ url_for('admin_menu') }}">Назад</a></nav>
+</header>
+<main>
+    <h2>Товар: {{ item.name or item_id }}</h2>
+    <form method="POST" style="max-width:480px;">
+        <label>Название</label>
+        <input name="name" value="{{ item.name or '' }}" required>
+        <label>Категория</label>
+        <input name="category" value="{{ item.category or '' }}">
+        <label>Цена</label>
+        <input name="price" type="number" value="{{ item.price or 0 }}" required>
+        <button type="submit">Сохранить</button>
+    </form>
+</main>
+</body>
+</html>

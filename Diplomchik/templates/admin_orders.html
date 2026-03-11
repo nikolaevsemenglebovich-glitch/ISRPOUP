@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Админка — Заказы</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <h1>Админка — Заказы</h1>
+    <nav><a href="{{ url_for('admin_menu') }}">Меню</a> | <a href="/logout">Выйти</a></nav>
+</header>
+<main>
+    <h2>Список заказов</h2>
+
+    {% if orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Дата/Время</th>
+                <th>Состав</th>
+                <th>Сумма</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.id }}</td>
+                <td>{{ o.datetime }}</td>
+                <td>
+                    <ul>
+                    {% for k, it in o.get("items", {}).items() %}
+                        <li>{{ it.name }} x {{ it.quantity }} — {{ it.price }}₽</li>
+                    {% endfor %}
+                    </ul>
+                </td>
+                <td>{{ o.total }}₽</td>
+                <td>{{ o.status }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('change_status', order_id=o.id) }}">
+                        <select name="status">
+                            <option value="new" {% if o.status=='new' %}selected{% endif %}>new</option>
+                            <option value="in_progress" {% if o.status=='in_progress' %}selected{% endif %}>in_progress</option>
+                            <option value="completed" {% if o.status=='completed' %}selected{% endif %}>completed</option>
+                        </select>
+                        <button type="submit">Обновить</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin_delete_order', order_id=o.id) }}" style="margin-top:6px;">
+                        <button type="submit" class="delete-btn">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Нет заказов.</p>
+    {% endif %}
+</main>
+</body>
+</html>

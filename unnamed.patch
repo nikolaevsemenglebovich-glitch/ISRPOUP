@@ -1,0 +1,1469 @@
+Index: DIPLOM/.idea/.gitignore
+===================================================================
+diff --git a/DIPLOM/.idea/.gitignore b/DIPLOM/.idea/.gitignore
+deleted file mode 100644
+--- a/DIPLOM/.idea/.gitignore	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,8 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml
+Index: DIPLOM/.idea/coffee_app.iml
+===================================================================
+diff --git a/DIPLOM/.idea/coffee_app.iml b/DIPLOM/.idea/coffee_app.iml
+deleted file mode 100644
+--- a/DIPLOM/.idea/coffee_app.iml	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,10 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="PYTHON_MODULE" version="4">
+-  <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$">
+-      <excludeFolder url="file://$MODULE_DIR$/.venv" />
+-    </content>
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: DIPLOM/.idea/inspectionProfiles/profiles_settings.xml
+===================================================================
+diff --git a/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml b/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/inspectionProfiles/profiles_settings.xml	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,6 +0,0 @@
+-<component name="InspectionProjectProfileManager">
+-  <settings>
+-    <option name="USE_PROJECT_PROFILE" value="false" />
+-    <version value="1.0" />
+-  </settings>
+-</component>
+\ No newline at end of file
+Index: DIPLOM/.idea/misc.xml
+===================================================================
+diff --git a/DIPLOM/.idea/misc.xml b/DIPLOM/.idea/misc.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/misc.xml	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="Black">
+-    <option name="sdkName" value="Python 3.12 (coffee_app)" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (coffee_app)" project-jdk-type="Python SDK" />
+-</project>
+\ No newline at end of file
+Index: DIPLOM/.idea/modules.xml
+===================================================================
+diff --git a/DIPLOM/.idea/modules.xml b/DIPLOM/.idea/modules.xml
+deleted file mode 100644
+--- a/DIPLOM/.idea/modules.xml	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,8 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="ProjectModuleManager">
+-    <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/coffee_app.iml" filepath="$PROJECT_DIR$/.idea/coffee_app.iml" />
+-    </modules>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: DIPLOM/app.py
+===================================================================
+diff --git a/DIPLOM/app.py b/DIPLOM/app.py
+deleted file mode 100644
+--- a/DIPLOM/app.py	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,260 +0,0 @@
+-from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+-import firebase_admin
+-from firebase_admin import credentials, db
+-from datetime import datetime
+-import random
+-
+-app = Flask(__name__)
+-app.secret_key = "supersecretkey"  # для сессий
+-
+-# -------------------- Firebase --------------------
+-cred = credentials.Certificate("serviceAccountKey.json")
+-firebase_admin.initialize_app(cred, {
+-    'databaseURL': 'https://coffee-to-go-812dd-default-rtdb.firebaseio.com/'
+-})
+-
+-root_ref = db.reference("/coffee_shop")
+-
+-# -------------------- Routes ----------------------
+-@app.route('/')
+-def index():
+-    menu = root_ref.child('menu').get() or {}
+-    return render_template('index.html', menu=menu)
+-
+-# Логин
+-@app.route('/login', methods=['GET', 'POST'])
+-def login():
+-    if request.method == 'POST':
+-        login = request.form['login']
+-        password = request.form['password']
+-        users = root_ref.child('users').get() or {}
+-        for uid, user in users.items():
+-            if user.get('login') == login and user.get('password') == password:
+-                session['user'] = uid
+-                session['role'] = user.get('role')
+-                return redirect(url_for('admin_menu'))
+-        return render_template('login.html', error="Неверный логин или пароль")
+-    return render_template('login.html')
+-
+-# Просмотр и редактирование меню (админ) — теперь отдаём menu, orders_list, users_list
+-@app.route('/admin/menu', methods=['GET', 'POST'])
+-def admin_menu():
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-
+-    menu_ref = root_ref.child('menu')
+-
+-    if request.method == 'POST':
+-        # Добавляем новый товар
+-        name = request.form.get('name', '').strip()
+-        price = int(request.form.get('price') or 0)
+-        category = request.form.get('category', '').strip()
+-        current_menu = menu_ref.get() or {}
+-        next_index = len(current_menu) + 1
+-        item_key = f"item_{next_index:03d}"
+-        menu_ref.child(item_key).set({
+-            'name': name,
+-            'price': price,
+-            'category': category,
+-            'available': True
+-        })
+-        return redirect(url_for('admin_menu'))
+-
+-    menu = menu_ref.get() or {}
+-    # заказы и пользователи для вывода в админке
+-    orders = root_ref.child('orders').get() or {}
+-    users = root_ref.child('users').get() or {}
+-
+-    # Преобразуем orders и users в списки удобные для шаблона
+-    orders_list = []
+-    for oid, odata in (orders.items() if isinstance(orders, dict) else []):
+-        orders_list.append({
+-            'id': oid,
+-            'items': odata.get('items', {}),
+-            'total': odata.get('total', 0),
+-            'status': odata.get('status', ''),
+-            'datetime': odata.get('datetime', '')
+-        })
+-    # сортируем по дате (если есть)
+-    orders_list.sort(key=lambda x: x.get('datetime') or '', reverse=True)
+-
+-    users_list = []
+-    for uid, udata in (users.items() if isinstance(users, dict) else []):
+-        users_list.append({
+-            'id': uid,
+-            'name': udata.get('name') or udata.get('login') or '',
+-            'email': udata.get('email', ''),
+-            'phone': udata.get('phone', ''),
+-            'role': udata.get('role', '')
+-        })
+-
+-    return render_template('admin_menu.html', menu=menu, orders=orders_list, users=users_list)
+-
+-# Просмотр заказов (отдельный роут, если нужно)
+-@app.route('/admin/orders')
+-def admin_orders():
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-    orders = root_ref.child('orders').get() or {}
+-    menu = root_ref.child('menu').get() or {}
+-    orders_list = []
+-    for oid, odata in (orders.items() if isinstance(orders, dict) else []):
+-        orders_list.append({
+-            'id': oid,
+-            'items': odata.get('items', {}),
+-            'total': odata.get('total', 0),
+-            'status': odata.get('status', ''),
+-            'datetime': odata.get('datetime', '')
+-        })
+-    orders_list.sort(key=lambda x: x.get('datetime') or '', reverse=True)
+-    return render_template('admin_orders.html', orders=orders_list, menu=menu)
+-
+-# Изменение статуса заказа (админ)
+-@app.route('/admin/orders/<order_id>/status', methods=['POST'])
+-def change_status(order_id):
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-    new_status = request.form['status']
+-    root_ref.child('orders').child(order_id).update({'status': new_status})
+-    return redirect(url_for('admin_orders'))
+-
+-# Удаление товара (админ)
+-@app.route('/admin/menu/<item_id>/delete', methods=['POST'])
+-def delete_item(item_id):
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-    root_ref.child('menu').child(item_id).delete()
+-    return redirect(url_for('admin_menu'))
+-
+-# Редактирование товара (админ)
+-@app.route('/admin/edit/<item_id>', methods=['GET', 'POST'])
+-def edit_item(item_id):
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-    menu_ref = root_ref.child('menu')
+-    if request.method == 'POST':
+-        name = request.form.get('name', '').strip()
+-        category = request.form.get('category', '').strip()
+-        price = float(request.form.get('price') or 0)
+-        menu_ref.child(item_id).update({
+-            'name': name,
+-            'category': category,
+-            'price': price
+-        })
+-        return redirect(url_for('admin_menu'))
+-    item = menu_ref.child(item_id).get() or {}
+-    return render_template('edit_item.html', item=item, item_id=item_id)
+-
+-# Создание заказа клиентом
+-@app.route('/create_order', methods=['POST'])
+-def create_order():
+-    data = request.get_json()  # получаем корзину в виде JSON
+-    if not data:
+-        return jsonify({'ok': False, 'message': "Корзина пуста"}), 400
+-
+-    # считаем total и нормализуем items
+-    items = {}
+-    total = 0
+-    for key, v in data.items():
+-        name = v.get('name')
+-        price = float(v.get('price', 0))
+-        qty = int(v.get('quantity', 0))
+-        items[key] = {'name': name, 'price': price, 'quantity': qty}
+-        total += price * qty
+-
+-    # Генерация уникального order_id
+-    order_id = f"order_{random.randint(1000, 9999)}"
+-
+-    # Сохранение в Firebase
+-    root_ref.child('orders').child(order_id).set({
+-        'items': items,
+-        'total': total,
+-        'status': 'new',
+-        'datetime': datetime.now().strftime("%Y-%m-%d %H:%M")
+-    })
+-
+-    # Возвращаем JSON с id и сообщением (frontend покажет красивый toast)
+-    return jsonify({'ok': True, 'order_id': order_id, 'message': f"Ваш заказ №{order_id} успешно создан!"})
+-
+-# Логин баристы
+-@app.route('/login_barista', methods=['GET', 'POST'])
+-def login_barista():
+-    if request.method == 'POST':
+-        login = request.form['login']
+-        password = request.form['password']
+-        users = root_ref.child('users').get() or {}
+-        for uid, user in users.items():
+-            if user.get('login') == login and user.get('password') == password and user.get('role') == 'barista':
+-                session['user'] = uid
+-                session['role'] = 'barista'
+-                return redirect(url_for('barista_orders'))
+-        return render_template('login_barista.html', error="Неверный логин или пароль")
+-    return render_template('login_barista.html')
+-
+-@app.route('/barista/orders')
+-def barista_orders():
+-    # проверка роли
+-    if 'user' not in session or session.get('role') != 'barista':
+-        return redirect('/login_barista')
+-
+-    orders = root_ref.child("orders").get() or {}
+-    orders_list = []
+-    for oid, odata in orders.items():
+-        orders_list.append({
+-            "id": oid,
+-            "items": odata.get("items", {}),
+-            "total": odata.get("total", 0),
+-            "status": odata.get("status", ""),
+-            "datetime": odata.get("datetime", "")
+-        })
+-
+-    orders_list.sort(key=lambda x: x.get("datetime") or "", reverse=True)
+-
+-    return render_template("barista_orders.html", orders=orders_list)
+-# Панель баристы — преобразуем orders в список, отсортированный по datetime
+-@app.route('/api/barista/orders')
+-def api_barista_orders():
+-    # проверка роли
+-    if 'user' not in session or session.get('role') != 'barista':
+-        return jsonify({'ok': False, 'error': 'unauthorized'}), 401
+-
+-    orders = root_ref.child('orders').get() or {}
+-    orders_list = []
+-    for oid, odata in (orders.items() if isinstance(orders, dict) else []):
+-        orders_list.append({
+-            'id': oid,
+-            'items': odata.get('items', {}),
+-            'total': odata.get('total', 0),
+-            'status': odata.get('status', ''),
+-            'datetime': odata.get('datetime', '')
+-        })
+-    # сортируем по datetime при наличии
+-    orders_list.sort(key=lambda x: x.get('datetime') or '', reverse=True)
+-    return jsonify({'ok': True, 'orders': orders_list})
+-
+-# Обновление статуса заказа баристой
+-@app.route('/barista/orders/<order_id>/status', methods=['POST'])
+-def barista_change_status(order_id):
+-    if 'user' not in session or session.get('role') != 'barista':
+-        return redirect(url_for('login_barista'))
+-    new_status = request.form.get('status')
+-    root_ref.child('orders').child(order_id).update({'status': new_status})
+-    return redirect(url_for('barista_orders'))
+-
+-# Удаление заказа (админ) — опционально
+-@app.route('/admin/orders/<order_id>/delete', methods=['POST'])
+-def admin_delete_order(order_id):
+-    if 'user' not in session or session.get('role') != 'admin':
+-        return redirect(url_for('login'))
+-    root_ref.child('orders').child(order_id).delete()
+-    return redirect(url_for('admin_orders'))
+-
+-# Выход
+-@app.route('/logout')
+-def logout():
+-    session.clear()
+-    return redirect(url_for('index'))
+-
+-# -------------------- Run -------------------------
+-if __name__ == '__main__':
+-    app.run(debug=True)
+Index: DIPLOM/serviceAccountKey.json
+===================================================================
+diff --git a/DIPLOM/serviceAccountKey.json b/DIPLOM/serviceAccountKey.json
+deleted file mode 100644
+--- a/DIPLOM/serviceAccountKey.json	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,13 +0,0 @@
+-{
+-  "type": "service_account",
+-  "project_id": "coffee-to-go-812dd",
+-  "private_key_id": "a557a85bc085e7f45b48629b0281d343ba85ebce",
+-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDHP3hdKzutxCZ6\n8lAr3t5VPdX8uHdtSoHhT6Lcanu/VcO328ny9jrWzBK6GoTboA/x3J8VUeWJAtkb\nmYFynwmUmPpLp3c6oDJFL/rWfPhnqxX8QINEjlkGafD3Ct79oMPJ0ou6t40aZELd\nMbvrL4JU56YfyW2HMG1b48Ex4SvTiTn9mZx91lxivx8Nv/uAMAtBG9IdGsI3hsBY\nQ8jPJ423oqaKzEV45WH4UbQC9WLXPLRTVHGnQ+tiChY9dTI9DktjIP3KWIUPur7U\nx+AkLojan/OIjm+Fl3syGucqc+Mht4ACwdjDeKt0qvKaYQqtP1hcHxk9JZFgBf3L\nkkzBVesFAgMBAAECggEAEUSdxLawU4/U5UHmky7GZm0srwbjtCaexAKtXYdNq0Lz\nv+r+AR8NnBEQAcNg8VHZdT+G0Ae1f3QuPGyc4eyznVvMEXjK5gX9Oq7SVqV6YoMF\ngu5VEhYjfrakH3JN6ihKik1uNmPzCC8D9nykHy69D75ge4/EUiZEdrrHQxs95krE\nA20+YGJxO8L2vTVvAmJKwq0E5jjfxlM3kjLkUtLcxdj3UEGpMhlffvWhuibKd2TY\nQPa0rCIRf7LfJAz3c6+kbFoy2wkMavjT6VylANq3e/qyZ4tEPCo2TCvmNVIkucKs\nAToZuXheHSwzbcg55GXDLdvWGaDArglnr8vcB+axDwKBgQDlYwf5SbyK0KfJq6SG\nxMrGIFPAhbv7SpgfnJ5xkXFAFln1mLs8jz6ar9xhQpPfD7kGn7MAtxFCT2wZ4xHl\ni9qBYMDvSdPeHBwlJ6do6iO+E4hIZYPa0BfQVWH2A0WFfYiHXuQPKEHD2HCLhJzK\nDh+4+iQS1s13oDpyytohxDLTdwKBgQDeXUovZLYdV5RB4cXPUcV6B1k0MCDqjaLE\n79kepM4sASnPTm9KHL6lrLEteM5hV/4rWvYYRFIqys0XzDoNIlfZXSyc5zYBCqe3\nsWni26yum0ZJEot9EH5RJQYOw0Vwv6ME38bohbf2wKeKEah5Daeu54zL4C/tg2Un\nBkx4IeP8YwKBgHbqkvyqPEMejo1fHSj8pj52DdUVv3Ezp49jy0QG6VYXAEXxCsgH\nXqYkmzQUpsIRzZLggZTSUvE0aU82R1Xf3cQKm5qxhFN18SVV3FToZOUqDRGzBtsN\n2/qV+PXnlkfw3zGGgOZWsVlNQHMjqYCaN9nWW5Mkplnox8Qw40p0AwFbAoGARz+v\nEIZ9j+NK/t0fq7EwzEvkekNdmKovWFjdweLeqNzqj6E7KY0STTWLQ92siyZNq4im\nx9nEVi/LDXADvceeTGh9bfzroePPH526JtVqfDwGhk1p4nXRc6CgU0SgUGMnEd29\n9y05Z9gNFsFXsQn+C53n0D+SO9FZLOrov6lkSq8CgYAesMRfKqhcwwWPrF4ix8T7\ngG/KvaqG7JHYn2UW87uDlhypP0M02NjhoDW4sgqr1R+FIXKJsjPOxDTTlcGg998T\nAd5YN+TPnZO/UDoBdnnAg8NkXV3bRhrS9vlFTP33DQj1HMlpCLZNZVMF3FylaXcR\na946qhpA5grphATTKPWmoA==\n-----END PRIVATE KEY-----\n",
+-  "client_email": "firebase-adminsdk-fbsvc@coffee-to-go-812dd.iam.gserviceaccount.com",
+-  "client_id": "101089867572133796422",
+-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+-  "token_uri": "https://oauth2.googleapis.com/token",
+-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40coffee-to-go-812dd.iam.gserviceaccount.com",
+-  "universe_domain": "googleapis.com"
+-}
+Index: DIPLOM/static/css/style.css
+===================================================================
+diff --git a/DIPLOM/static/css/style.css b/DIPLOM/static/css/style.css
+deleted file mode 100644
+--- a/DIPLOM/static/css/style.css	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,131 +0,0 @@
+-/* === Общие стили === */
+-:root{
+-  --yellow:#ffd600;
+-  --accent:#ffb700;
+-  --danger:#e60000;
+-  --success:#2ecc71;
+-  --text:#333;
+-  --bg:#f8f8f8;
+-}
+-
+-*{box-sizing:border-box}
+-body {
+-  font-family: 'Roboto', Arial, sans-serif;
+-  margin: 0;
+-  padding: 0;
+-  background: var(--bg);
+-  color: var(--text);
+-}
+-
+-/* Header */
+-header{
+-  background: var(--yellow);
+-  padding: 15px 30px;
+-  display:flex;
+-  justify-content:space-between;
+-  align-items:center;
+-  box-shadow:0 2px 6px rgba(0,0,0,0.06);
+-}
+-header h1{ margin:0; font-size:22px; color:#222; }
+-header nav a{ margin-left:18px; text-decoration:none; color:#222; font-weight:600; }
+-
+-/* Main layout */
+-main{ padding:28px; }
+-
+-/* === Меню карточки === */
+-.menu{ display:flex; flex-wrap:wrap; gap:18px; }
+-.card{
+-  background:#fff;
+-  padding:14px;
+-  border-radius:10px;
+-  width:220px;
+-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+-  display:flex; flex-direction:column; justify-content:space-between;
+-}
+-.card h3{ margin:0 0 8px 0; font-size:18px; }
+-.card p{ margin:4px 0; color:#555 }
+-.card button{
+-  margin-top:10px;
+-  padding:8px;
+-  border-radius:8px;
+-  border:none;
+-  background:var(--accent);
+-  font-weight:700;
+-  cursor:pointer;
+-}
+-
+-/* === Cart === */
+-#cart{
+-  position:fixed;
+-  right:20px;
+-  top:100px;
+-  width:260px;
+-  background:#fff;
+-  padding:16px;
+-  border-radius:12px;
+-  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+-  z-index:100;
+-}
+-#cart h2{ margin-top:0; color:var(--accent) }
+-#cart ul{ list-style:none; padding:0; margin:0; max-height:240px; overflow:auto }
+-#cart ul li{ display:flex; justify-content:space-between; margin-bottom:8px; align-items:center }
+-
+-/* cart buttons */
+-#cart button{ width:100%; padding:8px; border-radius:8px; border:none; background:var(--danger); color:#fff; font-weight:700; cursor:pointer }
+-
+-/* === Admin specific === */
+-.section-card{ background:#fff; padding:18px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.04); margin-bottom:20px }
+-.menu-admin{ display:flex; flex-wrap:wrap; gap:14px }
+-.card-admin{ width:220px; padding:12px; border-radius:10px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,0.04) }
+-.card-admin h3{ margin:0 0 6px }
+-.card-admin p{ margin:4px 0; color:#555 }
+-.card-admin button{ margin-right:8px; padding:8px 10px; border-radius:8px; border:none; cursor:pointer }
+-.delete-btn{ background:#f44336; color:#fff; }
+-
+-/* tables */
+-table{ width:100%; border-collapse:collapse; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.04) }
+-table thead { background:#fafafa }
+-table th, table td{ padding:10px 12px; text-align:left; border-bottom:1px solid #f1f1f1 }
+-table tbody tr:last-child td{ border-bottom:none }
+-
+-/* small helpers */
+-.btn-small{ padding:6px 8px; border-radius:6px; border:none; cursor:pointer }
+-
+-/* statuses */
+-.status-new{ color: #ff9900; font-weight:700 }
+-.status-in_progress{ color:#0059b3; font-weight:700 }
+-.status-completed{ color:#00b300; font-weight:700 }
+-
+-/* === toast === */
+-.toast{
+-  position: fixed;
+-  bottom: 30px;
+-  right: 30px;
+-  padding: 12px 18px;
+-  border-radius: 10px;
+-  font-size: 15px;
+-  color: #fff;
+-  opacity: 0;
+-  transform: translateY(18px);
+-  transition: 0.28s ease;
+-  z-index: 99999;
+-  pointer-events:none;
+-}
+-.toast.show{ opacity:1; transform:translateY(0) }
+-.toast-success{ background: var(--success) }
+-.toast-error{ background: #e74c3c }
+-
+-/* === Barista table specific === */
+-.orders-table{ width:100%; border-collapse:collapse; margin-top:12px }
+-.order-row td{ vertical-align:top }
+-.order-row.status-new{ background: rgba(255,153,0,0.04) }
+-.order-row.status-in_progress{ background: rgba(0,89,179,0.03) }
+-.order-row.status-completed{ background: rgba(0,179,0,0.03) }
+-
+-/* Responsive */
+-@media (max-width:900px){
+-  #cart{ display:none } /* hide cart on small screens */
+-  .menu{ justify-content:center }
+-  .menu-admin{ justify-content:center }
+-  table th, table td{ padding:8px }
+-}
+Index: DIPLOM/static/js/main.js
+===================================================================
+diff --git a/DIPLOM/static/js/main.js b/DIPLOM/static/js/main.js
+deleted file mode 100644
+--- a/DIPLOM/static/js/main.js	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,86 +0,0 @@
+-let cart = {};
+-
+-function showToastMessage(text, success = true) {
+-    let toast = document.getElementById("toast");
+-    if (!toast) {
+-        toast = document.createElement("div");
+-        toast.id = "toast";
+-        document.body.appendChild(toast);
+-    }
+-
+-    toast.className = success ? "toast toast-success" : "toast toast-error";
+-    toast.innerText = text;
+-
+-    // Анимация: сначала прозрачный → затем появление
+-    setTimeout(() => toast.classList.add("show"), 10);
+-
+-    setTimeout(() => {
+-        toast.classList.remove("show");
+-    }, 3000);
+-}
+-    }
+-    toast.innerText = text;
+-    toast.style.display = 'block';
+-    toast.style.background = success ? '#2ecc71' : '#e74c3c';
+-    toast.style.color = '#fff';
+-    toast.style.padding = '12px 18px';
+-    toast.style.borderRadius = '8px';
+-    toast.style.position = 'fixed';
+-    toast.style.right = '30px';
+-    toast.style.bottom = '30px';
+-    toast.style.zIndex = '9999';
+-    setTimeout(()=>{ toast.style.display = 'none'; }, 3000);
+-}
+-
+-function addToCart(id, name, price){
+-    if(cart[id]) cart[id].quantity++;
+-    else cart[id] = {name:name, price:price, quantity:1};
+-    renderCart();
+-    showToastMessage('Добавлено в корзину', true);
+-}
+-
+-function renderCart(){
+-    const ul = document.getElementById('cart-items');
+-    if(!ul) return;
+-    ul.innerHTML = '';
+-    let total = 0;
+-    for(let id in cart){
+-        const item = cart[id];
+-        total += item.price * item.quantity;
+-        ul.innerHTML += `<li>${item.name} x ${item.quantity} <button onclick="removeItem('${id}')">❌</button></li>`;
+-    }
+-    const totalEl = document.getElementById('total');
+-    if(totalEl) totalEl.innerText = total;
+-}
+-
+-function removeItem(id){
+-    delete cart[id];
+-    renderCart();
+-}
+-
+-function checkout(){
+-    if(Object.keys(cart).length === 0){
+-        showToastMessage("Корзина пуста", false);
+-        return;
+-    }
+-
+-    fetch("/create_order", {
+-        method: "POST",
+-        headers: { "Content-Type": "application/json" },
+-        body: JSON.stringify(cart)
+-    })
+-    .then(res => res.json())
+-    .then(data => {
+-        if(data.ok){
+-            showToastMessage(data.message, true);
+-            cart = {};
+-            renderCart();
+-        } else {
+-            showToastMessage(data.message || 'Ошибка создания заказа', false);
+-        }
+-    })
+-    .catch(err => {
+-        showToastMessage('Сетевая ошибка', false);
+-        console.error(err);
+-    });
+-}
+Index: DIPLOM/templates/admin_menu.html
+===================================================================
+diff --git a/DIPLOM/templates/admin_menu.html b/DIPLOM/templates/admin_menu.html
+deleted file mode 100644
+--- a/DIPLOM/templates/admin_menu.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,97 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Админка — Управление</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body>
+-<header>
+-    <h1>Админка — Управление</h1>
+-    <nav>
+-        <a href="/">Главная</a>
+-        <a href="{{ url_for('admin_orders') }}">Заказы</a>
+-        <a href="/logout">Выйти</a>
+-    </nav>
+-</header>
+-<main>
+-
+-    <div class="section-card">
+-        <h2>Управление товарами ☕</h2>
+-
+-        <!-- Форма добавления товара -->
+-        <form method="POST" style="margin-bottom:20px; max-width:480px;">
+-            <input name="name" placeholder="Название" required>
+-            <input name="price" type="number" placeholder="Цена" required>
+-            <input name="category" placeholder="Категория" required>
+-            <button type="submit">Добавить товар</button>
+-        </form>
+-
+-        <div class="menu-admin">
+-            {% if menu %}
+-                {% for key, item in menu.items() %}
+-                <div class="card-admin">
+-                    <h3>{{ item.name }}</h3>
+-                    <p>Категория: {{ item.category }}</p>
+-                    <p>Цена: {{ item.price }}₽</p>
+-                    <button onclick="window.location.href='{{ url_for('edit_item', item_id=key) }}'">Редактировать</button>
+-                    <button class="delete-btn" onclick="deleteItem('{{ key }}', '{{ item.name }}')">Удалить</button>
+-                </div>
+-                {% endfor %}
+-            {% else %}
+-                <p>Нет товаров в меню.</p>
+-            {% endif %}
+-        </div>
+-    </div>
+-
+-    <hr>
+-
+-    <div class="section-card">
+-        <h2>Короткий обзор заказов</h2>
+-        <p>Всего заказов: <strong>{{ orders|length }}</strong></p>
+-        <p><a href="{{ url_for('admin_orders') }}">Перейти к полному списку заказов</a></p>
+-    </div>
+-
+-    <hr>
+-
+-    <div class="section-card">
+-        <h2>Список пользователей 👥</h2>
+-        {% if users %}
+-        <table>
+-            <thead>
+-                <tr>
+-                    <th>ID</th><th>Имя</th><th>Email</th><th>Телефон</th><th>Роль</th>
+-                </tr>
+-            </thead>
+-            <tbody>
+-                {% for u in users %}
+-                <tr>
+-                    <td>{{ u.id }}</td>
+-                    <td>{{ u.name }}</td>
+-                    <td>{{ u.email }}</td>
+-                    <td>{{ u.phone }}</td>
+-                    <td>{{ u.role }}</td>
+-                </tr>
+-                {% endfor %}
+-            </tbody>
+-        </table>
+-        {% else %}
+-        <p>Нет зарегистрированных пользователей.</p>
+-        {% endif %}
+-    </div>
+-
+-</main>
+-
+-<script>
+-function deleteItem(id, name){
+-    if(confirm(`Удалить товар "${name}" (${id})?`)){
+-        fetch('{{ url_for("delete_item", item_id="__ID__") }}'.replace('__ID__', id), { method: "POST" })
+-        .then(res => {
+-            if(res.ok) location.reload();
+-            else alert('Ошибка при удалении');
+-        }).catch(e => alert('Сеть: ' + e));
+-    }
+-}
+-</script>
+-</body>
+-</html>
+Index: DIPLOM/templates/admin_orders.html
+===================================================================
+diff --git a/DIPLOM/templates/admin_orders.html b/DIPLOM/templates/admin_orders.html
+deleted file mode 100644
+--- a/DIPLOM/templates/admin_orders.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,64 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Админка — Заказы</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body>
+-<header>
+-    <h1>Админка — Заказы</h1>
+-    <nav><a href="{{ url_for('admin_menu') }}">Меню</a> | <a href="/logout">Выйти</a></nav>
+-</header>
+-<main>
+-    <h2>Список заказов</h2>
+-
+-    {% if orders %}
+-    <table>
+-        <thead>
+-            <tr>
+-                <th>ID</th>
+-                <th>Дата/Время</th>
+-                <th>Состав</th>
+-                <th>Сумма</th>
+-                <th>Статус</th>
+-                <th>Действия</th>
+-            </tr>
+-        </thead>
+-        <tbody>
+-            {% for o in orders %}
+-            <tr>
+-                <td>{{ o.id }}</td>
+-                <td>{{ o.datetime }}</td>
+-                <td>
+-                    <ul>
+-                    {% for k, it in o.get("items", {}).items() %}
+-                        <li>{{ it.name }} x {{ it.quantity }} — {{ it.price }}₽</li>
+-                    {% endfor %}
+-                    </ul>
+-                </td>
+-                <td>{{ o.total }}₽</td>
+-                <td>{{ o.status }}</td>
+-                <td>
+-                    <form method="POST" action="{{ url_for('change_status', order_id=o.id) }}">
+-                        <select name="status">
+-                            <option value="new" {% if o.status=='new' %}selected{% endif %}>new</option>
+-                            <option value="in_progress" {% if o.status=='in_progress' %}selected{% endif %}>in_progress</option>
+-                            <option value="completed" {% if o.status=='completed' %}selected{% endif %}>completed</option>
+-                        </select>
+-                        <button type="submit">Обновить</button>
+-                    </form>
+-                    <form method="POST" action="{{ url_for('admin_delete_order', order_id=o.id) }}" style="margin-top:6px;">
+-                        <button type="submit" class="delete-btn">Удалить</button>
+-                    </form>
+-                </td>
+-            </tr>
+-            {% endfor %}
+-        </tbody>
+-    </table>
+-    {% else %}
+-    <p>Нет заказов.</p>
+-    {% endif %}
+-</main>
+-</body>
+-</html>
+Index: DIPLOM/templates/barista_orders.html
+===================================================================
+diff --git a/DIPLOM/templates/barista_orders.html b/DIPLOM/templates/barista_orders.html
+deleted file mode 100644
+--- a/DIPLOM/templates/barista_orders.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,122 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Бариста — Заказы</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body>
+-<header>
+-    <h1>Бариста — Заказы</h1>
+-    <nav>
+-        <a href="/">Главная</a>
+-        <a href="/logout">Выйти</a>
+-    </nav>
+-</header>
+-
+-<main>
+-    <h2>Текущие заказы</h2>
+-
+-    <table class="orders-table" id="orders-table">
+-        <thead>
+-            <tr>
+-                <th>Номер</th>
+-                <th>Время</th>
+-                <th>Состав</th>
+-                <th>Сумма</th>
+-                <th>Статус</th>
+-                <th>Действие</th>
+-            </tr>
+-        </thead>
+-        <tbody id="orders-tbody">
+-        {% for o in orders %}
+-            <tr class="order-row status-{{ o.status }}" data-id="{{ o.id }}">
+-                <td><strong>{{ o.id.split('_')[-1] }}</strong></td>
+-                <td>{{ o.datetime }}</td>
+-                <td>
+-                    <ul style="margin:0; padding-left:16px;">
+-                    {% for k, it in o.get("items", {}).items() %}
+-                        <li>{{ it.name }} × {{ it.quantity }} ({{ it.price }}₽)</li>
+-                    {% endfor %}
+-                    </ul>
+-                </td>
+-                <td>{{ o.total }} ₽</td>
+-                <td><span class="status-{{ o.status }}">{{ o.status.replace('_',' ').capitalize() }}</span></td>
+-                <td>
+-                    {% if o.status != 'completed' %}
+-                    <form method="POST" action="{{ url_for('barista_change_status', order_id=o.id) }}">
+-                        {% if o.status == 'new' %}
+-                            <input type="hidden" name="status" value="in_progress">
+-                            <button type="submit">Начать</button>
+-                        {% elif o.status == 'in_progress' %}
+-                            <input type="hidden" name="status" value="completed">
+-                            <button type="submit">Готово</button>
+-                        {% endif %}
+-                    </form>
+-                    {% else %}
+-                        <span>Завершён</span>
+-                    {% endif %}
+-                </td>
+-            </tr>
+-        {% endfor %}
+-        </tbody>
+-    </table>
+-
+-</main>
+-
+-<script>
+-// функция, которая получает заказы JSON и перерисовывает tbody
+-async function fetchAndRenderOrders(){
+-    try {
+-        const res = await fetch('{{ url_for("api_barista_orders") }}', { cache: "no-store" });
+-        if(!res.ok) {
+-            // если 401 — перенаправляем на логин
+-            if(res.status === 401) window.location.href = "{{ url_for('login_barista') }}";
+-            return;
+-        }
+-        const data = await res.json();
+-        if(!data.ok) return;
+-        const orders = data.orders || [];
+-        const tbody = document.getElementById('orders-tbody');
+-        if(!tbody) return;
+-        let html = '';
+-        for(const o of orders){
+-            html += `<tr class="order-row status-${o.status}" data-id="${o.id}">
+-                <td><strong>${o.id.split('_').pop()}</strong></td>
+-                <td>${o.datetime || ''}</td>
+-                <td><ul style="margin:0; padding-left:16px;">`;
+-            for(const k in o.items){
+-                const it = o.items[k];
+-                html += `<li>${it.name} × ${it.quantity} (${it.price}₽)</li>`;
+-            }
+-            html += `</ul></td>
+-                <td>${o.total} ₽</td>
+-                <td><span class="status-${o.status}">${o.status.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase())}</span></td>
+-                <td>`;
+-            if(o.status !== 'completed'){
+-                if(o.status === 'new'){
+-                    html += `<form method="POST" action="/barista/orders/${o.id}/status"><input type="hidden" name="status" value="in_progress"><button type="submit">Начать</button></form>`;
+-                } else if(o.status === 'in_progress'){
+-                    html += `<form method="POST" action="/barista/orders/${o.id}/status"><input type="hidden" name="status" value="completed"><button type="submit">Готово</button></form>`;
+-                } else {
+-                    html += `<span>Обновить</span>`;
+-                }
+-            } else {
+-                html += `<span>Завершён</span>`;
+-            }
+-            html += `</td></tr>`;
+-        }
+-        tbody.innerHTML = html;
+-    } catch (err) {
+-        console.error('Ошибка при обновлении заказов', err);
+-    }
+-}
+-
+-// первичная загрузка уже есть от сервера, но запустим обновление через 1с
+-setTimeout(fetchAndRenderOrders, 1000);
+-// и дальше опрашиваем каждые 5 секунд
+-setInterval(fetchAndRenderOrders, 5000);
+-</script>
+-
+-</body>
+-</html>
+Index: DIPLOM/templates/edit_item.html
+===================================================================
+diff --git a/DIPLOM/templates/edit_item.html b/DIPLOM/templates/edit_item.html
+deleted file mode 100644
+--- a/DIPLOM/templates/edit_item.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,26 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Редактировать товар</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body>
+-<header>
+-    <h1>Редактировать товар</h1>
+-    <nav><a href="{{ url_for('admin_menu') }}">Назад</a></nav>
+-</header>
+-<main>
+-    <h2>Товар: {{ item.name or item_id }}</h2>
+-    <form method="POST" style="max-width:480px;">
+-        <label>Название</label>
+-        <input name="name" value="{{ item.name or '' }}" required>
+-        <label>Категория</label>
+-        <input name="category" value="{{ item.category or '' }}">
+-        <label>Цена</label>
+-        <input name="price" type="number" value="{{ item.price or 0 }}" required>
+-        <button type="submit">Сохранить</button>
+-    </form>
+-</main>
+-</body>
+-</html>
+Index: DIPLOM/templates/index.html
+===================================================================
+diff --git a/DIPLOM/templates/index.html b/DIPLOM/templates/index.html
+deleted file mode 100644
+--- a/DIPLOM/templates/index.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,287 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Кофе с собой</title>
+-    <style>
+-        body {
+-            font-family: Arial, sans-serif;
+-            margin: 0;
+-            padding: 0;
+-            background-color: #f0f0f0;
+-        }
+-
+-        header {
+-            background-color: #ffc800; /* Желтый цвет из макета */
+-            color: #000;
+-            padding: 10px 40px;
+-            display: flex;
+-            justify-content: space-between;
+-            align-items: center;
+-        }
+-
+-        header h1 {
+-            margin: 0;
+-            font-size: 24px;
+-        }
+-
+-        header nav a {
+-            color: #000;
+-            text-decoration: none;
+-            margin-left: 20px;
+-            font-weight: bold;
+-        }
+-
+-        main {
+-            padding: 40px;
+-        }
+-
+-        .menu-and-cart {
+-            display: flex;
+-            flex-wrap: wrap;
+-            gap: 20px;
+-            margin-bottom: 40px;
+-        }
+-
+-        .menu {
+-            display: flex;
+-            flex-wrap: wrap;
+-            gap: 20px;
+-            flex-grow: 1; /* Чтобы товары занимали больше места */
+-        }
+-
+-        .card, #cart {
+-            background-color: #fff;
+-            padding: 15px;
+-            border-radius: 8px;
+-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+-            width: 200px; /* Фиксированная ширина для карточек товаров */
+-            box-sizing: border-box;
+-        }
+-
+-        #cart {
+-            width: 250px; /* Ширина корзины */
+-            align-self: flex-start; /* Прижать корзину к верху */
+-        }
+-
+-        .card h3, #cart h2 {
+-            margin-top: 0;
+-            font-size: 18px;
+-        }
+-
+-        .card p {
+-            margin: 5px 0;
+-            font-size: 14px;
+-        }
+-
+-        button {
+-            background-color: #ffc800;
+-            border: none;
+-            padding: 10px 15px;
+-            border-radius: 4px;
+-            cursor: pointer;
+-            font-weight: bold;
+-            width: 100%;
+-            margin-top: 10px;
+-        }
+-
+-        #cart button {
+-            background-color: #dc3545; /* Красная кнопка для оформления заказа */
+-            color: #fff;
+-        }
+-
+-        #cart ul {
+-            list-style: none;
+-            padding: 0;
+-        }
+-
+-        #cart li {
+-            padding: 5px 0;
+-            border-bottom: 1px dashed #ccc;
+-        }
+-
+-        #contacts h2, #reviews h2 {
+-            margin-bottom: 20px;
+-        }
+-
+-        .contact-info {
+-            display: flex;
+-            gap: 20px;
+-        }
+-
+-        .contact-card {
+-            background-color: #fff;
+-            padding: 15px;
+-            border-radius: 8px;
+-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+-            width: 250px;
+-        }
+-
+-        .email-info {
+-            padding: 15px 0;
+-        }
+-
+-        .reviews-container {
+-            display: flex;
+-            gap: 20px;
+-            margin-top: 20px;
+-        }
+-
+-        .review-card {
+-            background-color: #fff;
+-            padding: 15px;
+-            border-left: 5px solid #ffc800;
+-            border-radius: 4px;
+-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+-            flex: 1;
+-        }
+-
+-        #toast {
+-            display: none;
+-            position: fixed;
+-            bottom: 20px;
+-            left: 50%;
+-            transform: translateX(-50%);
+-            background-color: #333;
+-            color: #fff;
+-            padding: 10px 20px;
+-            border-radius: 5px;
+-            z-index: 1000;
+-        }
+-    </style>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body>
+-<header>
+-    <h1>Кофе с собой</h1>
+-    <nav>
+-        <a href="/login">Вход для админа</a>
+-        <a href="/login_barista">Вход для баристы</a>
+-    </nav>
+-</header>
+-<main>
+-    <div class="menu-and-cart">
+-        <div class="menu">
+-            {% for key, item in menu.items() %}
+-                <div class="card">
+-                    <h3>{{ item.name }}</h3>
+-                    <p>Категория: {{ item.category }}</p>
+-                    <p>Цена: {{ item.price }}₽</p>
+-                    <button onclick="addToCart('{{ key }}', '{{ item.name }}', {{ item.price }})">Добавить в корзину</button>
+-                </div>
+-            {% endfor %}
+-        </div>
+-
+-        <div id="cart">
+-            <h2>Корзина</h2>
+-            <ul id="cart-items">
+-                </ul>
+-            <p>Итого: <span id="total">0</span>₽</p>
+-            <button onclick="checkout()">Оформить заказ</button>
+-        </div>
+-        </div>
+-
+-    ---
+-
+-    <section id="contacts">
+-        <h2>Наши адреса и контакты</h2>
+-        <div class="contact-info">
+-            <div class="contact-card">
+-                <h3>ул. Ленинградская, 23/2</h3>
+-                <p>г. Асбест</p>
+-                <p>Телефон: +7 (999) 123-45-67</p>
+-            </div>
+-            <div class="email-info">
+-                <p>Email: info@coffee-s.com</p>
+-            </div>
+-        </div>
+-    </section>
+-
+-    ---
+-
+-    <section id="reviews">
+-        <h2>Отзывы наших клиентов</h2>
+-        <div class="reviews-container">
+-            <div class="review-card">
+-                <p>"Отличный кофе! Быстро и вкусно."</p>
+-                <p><strong>- Мария</strong></p>
+-            </div>
+-            <div class="review-card">
+-                <p>"Очень удобный сайт, заказы проходят без проблем."</p>
+-                <p><strong>- Алексей</strong></p>
+-            </div>
+-        </div>
+-    </section>
+-</main>
+-
+-<div id="toast">Добавлено в корзину!</div>
+-
+-<script>
+-    let cart = {};
+-
+-    function showToast(){
+-        const toast = document.getElementById('toast');
+-        toast.style.display = 'block';
+-        setTimeout(()=>{
+-            toast.style.display = 'none';
+-        }, 1200);
+-    }
+-
+-    function addToCart(id, name, price){
+-        if(cart[id]) cart[id].quantity++;
+-        else cart[id] = {name:name, price:price, quantity:1};
+-        renderCart();
+-        showToast();
+-    }
+-
+-    function renderCart(){
+-        const ul = document.getElementById('cart-items');
+-        ul.innerHTML = '';
+-        let total = 0;
+-        for(let id in cart){
+-            const item = cart[id];
+-            total += item.price * item.quantity;
+-            // Убрана кнопка "❌" для более чистого макета, но в рабочем коде ее лучше оставить
+-            ul.innerHTML += `<li>${item.name} x ${item.quantity} (${item.price * item.quantity}₽) <button onclick="removeItem('${id}')" style="background-color: transparent; color: black; padding: 0 5px; width: auto; margin-top: 0;">❌</button></li>`;
+-        }
+-        document.getElementById('total').innerText = total;
+-
+-        // Также обновляем статус кнопки "Оформить заказ" в корзине
+-        const checkoutButton = document.querySelector('#cart button');
+-        const cartTotal = document.getElementById('total').innerText;
+-        checkoutButton.innerText = 'Оформить заказ';
+-
+-        // Добавление "Итого: 0₽"
+-        if(Object.keys(cart).length === 0){
+-             document.getElementById('cart-items').innerHTML = '<li>Корзина пуста</li>';
+-             document.getElementById('total').innerText = '0';
+-             // Визуальное изменение кнопки при пустой корзине, как на макете
+-             checkoutButton.style.backgroundColor = '#dc3545';
+-             checkoutButton.innerText = 'Оформить заказ';
+-        } else {
+-             checkoutButton.style.backgroundColor = '#dc3545';
+-        }
+-    }
+-
+-    function removeItem(id){
+-        delete cart[id];
+-        renderCart();
+-    }
+-
+-    function checkout(){
+-        if(Object.keys(cart).length === 0){
+-            alert("Корзина пуста!");
+-            return;
+-        }
+-
+-        // Вместо fetch, просто alert для примера, так как бэкенд не предоставлен
+-        alert("Заказ оформлен! Спасибо за покупку.");
+-        cart = {};
+-        renderCart();
+-    }
+-
+-    // Инициализация корзины при загрузке страницы
+-    window.onload = renderCart;
+-</script>
+-</body>
+-</html>
+\ No newline at end of file
+Index: DIPLOM/templates/login.html
+===================================================================
+diff --git a/DIPLOM/templates/login.html b/DIPLOM/templates/login.html
+deleted file mode 100644
+--- a/DIPLOM/templates/login.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,87 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Вход</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-    <style>
+-        body {
+-            /* Устанавливаем Flexbox на body для центрирования всего содержимого */
+-            display: flex;
+-            flex-direction: column; /* Элементы располагаются вертикально */
+-            align-items: center; /* Центрирование по горизонтали */
+-            min-height: 100vh; /* Минимальная высота - вся видимая область */
+-            margin: 0;
+-            background-color: #f8f8f8; /* Светлый фон, как на макете */
+-            font-family: Arial, sans-serif;
+-        }
+-
+-        h1 {
+-            /* Заголовок "Вход для админа" */
+-            align-self: flex-start; /* Прижать заголовок к левому краю */
+-            width: 100%;
+-            padding: 20px 40px; /* Отступы от края */
+-            box-sizing: border-box;
+-            margin-top: 0;
+-            font-size: 24px;
+-        }
+-
+-        /* Контейнер для центрирования формы отдельно от заголовка */
+-        .login-container {
+-            flex-grow: 1; /* Позволяет контейнеру занять всё оставшееся вертикальное пространство */
+-            display: flex;
+-            justify-content: center; /* Центрирование формы по горизонтали */
+-            align-items: center; /* Центрирование формы по вертикали */
+-            width: 100%;
+-        }
+-
+-        form {
+-            background-color: #fff;
+-            padding: 30px;
+-            border-radius: 8px;
+-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+-            width: 300px; /* Фиксированная ширина, как на макете */
+-            box-sizing: border-box;
+-        }
+-
+-        label {
+-            display: block;
+-            margin-bottom: 5px;
+-            font-weight: bold;
+-            font-size: 14px;
+-        }
+-
+-        input[type="text"],
+-        input[type="password"] {
+-            width: 100%;
+-            padding: 10px;
+-            margin-bottom: 15px;
+-            border: 1px solid #ccc;
+-            border-radius: 4px;
+-            box-sizing: border-box;
+-        }
+-
+-        button[type="submit"] {
+-            background-color: #ffc800; /* Желтая кнопка */
+-            color: #000;
+-            border: none;
+-            padding: 10px 15px;
+-            border-radius: 4px;
+-            cursor: pointer;
+-            font-weight: bold;
+-            width: 100%;
+-        }
+-    </style>
+-</head>
+-<body>
+-    <h1>Вход для админа</h1>
+-
+-    <div class="login-container">
+-        <form method="POST">
+-            <label>Логин:</label>
+-            <input type="text" name="login" value="admin"> <label>Пароль:</label>
+-            <input type="password" name="password" value="......"> <button type="submit">Войти</button>
+-        </form>
+-    </div>
+-</body>
+-</html>
+\ No newline at end of file
+Index: DIPLOM/templates/login_barista.html
+===================================================================
+diff --git a/DIPLOM/templates/login_barista.html b/DIPLOM/templates/login_barista.html
+deleted file mode 100644
+--- a/DIPLOM/templates/login_barista.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,24 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <meta charset="UTF-8">
+-    <title>Вход для баристы</title>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-</head>
+-<body class="admin-login">
+-    <h1>Вход для баристы</h1>
+-
+-    <div class="login-container">
+-        <form method="POST" action="{{ url_for('login_barista') }}">
+-            {% if error %}
+-                <p style="color: red; font-weight: bold;">{{ error }}</p>
+-            {% endif %}
+-            <label>Логин:</label>
+-            <input type="text" name="login" required>
+-            <label>Пароль:</label>
+-            <input type="password" name="password" required>
+-            <button type="submit">Войти</button>
+-        </form>
+-    </div>
+-</body>
+-</html>
+\ No newline at end of file
+Index: DIPLOM/templates/menu_public.html
+===================================================================
+diff --git a/DIPLOM/templates/menu_public.html b/DIPLOM/templates/menu_public.html
+deleted file mode 100644
+--- a/DIPLOM/templates/menu_public.html	(revision ba5e14054a02868288baf08c8f4d78142685938c)
++++ /dev/null	(revision ba5e14054a02868288baf08c8f4d78142685938c)
+@@ -1,100 +0,0 @@
+-<!DOCTYPE html>
+-<html>
+-<head>
+-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+-    <title>Кофе с собой - Меню</title>
+-    <style>
+-        body { font-family: Arial, sans-serif; background: #f9f5f0; margin:0; padding:0;}
+-        header { background: #f7c948; padding: 15px 20px; display:flex; justify-content:space-between; align-items:center; color:white;}
+-        header h1 { margin:0; font-size:24px; }
+-        header nav a { color:white; margin-left:15px; text-decoration:none; font-weight:bold; }
+-
+-        .menu { display:flex; flex-wrap:wrap; justify-content:center; padding:20px; }
+-        .card { background:white; border-radius:10px; margin:10px; padding:15px; width:200px; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+-        .card h3 { margin:0; }
+-        .card button { margin-top:10px; background:#f7c948; border:none; padding:8px; border-radius:5px; cursor:pointer; }
+-
+-        #cart { position:fixed; top:80px; right:20px; background:white; padding:15px; border-radius:10px; width:250px; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+-        #cart h2 { margin-top:0; }
+-        #cart ul { list-style:none; padding:0; }
+-        #cart button { background:#f76c5e; color:white; border:none; padding:8px; border-radius:5px; cursor:pointer; width:100%; }
+-    </style>
+-</head>
+-<body>
+-
+-<header>
+-    <h1>Кофе с собой</h1>
+-    <nav>
+-        <a href="/login">Вход для админа</a>
+-        <a href="/login_barista">Вход для баристы</a>
+-    </nav>
+-</header>
+-
+-<div class="menu">
+-    {% for key, item in menu.items() %}
+-    <div class="card">
+-        <h3>{{ item.name }}</h3>
+-        <p>Категория: {{ item.category }}</p>
+-        <p>Цена: {{ item.price }}₽</p>
+-        <button onclick="addToCart('{{ key }}', '{{ item.name }}', {{ item.price }})">Добавить в корзину</button>
+-    </div>
+-    {% endfor %}
+-</div>
+-
+-<div id="cart">
+-    <h2>Корзина</h2>
+-    <ul id="cart-items"></ul>
+-    <p>Итого: <span id="total">0</span>₽</p>
+-    <button onclick="checkout()">Оформить заказ</button>
+-</div>
+-
+-
+-<script>
+-let cart = {};
+-
+-function addToCart(id, name, price){
+-    if(cart[id]) cart[id].quantity++;
+-    else cart[id] = {name:name, price:price, quantity:1};
+-    renderCart();
+-}
+-
+-function renderCart(){
+-    const ul = document.getElementById('cart-items');
+-    ul.innerHTML = '';
+-    let total = 0;
+-    for(let id in cart){
+-        const item = cart[id];
+-        total += item.price * item.quantity;
+-        ul.innerHTML += `<li>${item.name} x ${item.quantity} <button onclick="removeItem('${id}')">❌</button></li>`;
+-    }
+-    document.getElementById('total').innerText = total;
+-}
+-
+-function removeItem(id){
+-    delete cart[id];
+-    renderCart();
+-}
+-
+-function checkout(){
+-    if(Object.keys(cart).length === 0){
+-        alert("Корзина пуста!");
+-        return;
+-    }
+-
+-    fetch("/create_order", {
+-        method: "POST",
+-        headers: { "Content-Type": "application/json" },
+-        body: JSON.stringify(cart)
+-    }).then(res => res.text())
+-      .then(msg => {
+-          alert(msg);
+-          cart = {};
+-          renderCart();
+-      });
+-
+-}
+-
+-</script>
+-
+-</body>
+-</html>
+diff --git a/DIPLOM/.idea/.name b/DIPLOM/.idea/.name
+deleted file mode 100644
+index aa15e3edae7c1e011ee80f1b76848b74036ac747..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+Hc$@<O00001
+

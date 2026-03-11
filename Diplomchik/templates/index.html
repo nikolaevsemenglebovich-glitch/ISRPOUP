@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Кофе с собой</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header {
+            background-color: #ffc800; /* Желтый цвет из макета */
+            color: #000;
+            padding: 10px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header nav a {
+            color: #000;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .menu-and-cart {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            flex-grow: 1; /* Чтобы товары занимали больше места */
+        }
+
+        .card, #cart {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 200px; /* Фиксированная ширина для карточек товаров */
+            box-sizing: border-box;
+        }
+
+        #cart {
+            width: 250px; /* Ширина корзины */
+            align-self: flex-start; /* Прижать корзину к верху */
+        }
+
+        .card h3, #cart h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #ffc800;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #cart button {
+            background-color: #dc3545; /* Красная кнопка для оформления заказа */
+            color: #fff;
+        }
+
+        #cart ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #cart li {
+            padding: 5px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        #contacts h2, #reviews h2 {
+            margin-bottom: 20px;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        .contact-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 250px;
+        }
+
+        .email-info {
+            padding: 15px 0;
+        }
+
+        .reviews-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .review-card {
+            background-color: #fff;
+            padding: 15px;
+            border-left: 5px solid #ffc800;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            flex: 1;
+        }
+
+        #toast {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header>
+    <h1>Кофе с собой</h1>
+    <nav>
+        <a href="/login">Вход для админа</a>
+        <a href="/login_barista">Вход для баристы</a>
+    </nav>
+</header>
+<main>
+    <div class="menu-and-cart">
+        <div class="menu">
+            {% for key, item in menu.items() %}
+                <div class="card">
+                    <h3>{{ item.name }}</h3>
+                    <p>Категория: {{ item.category }}</p>
+                    <p>Цена: {{ item.price }}₽</p>
+                    <button onclick="addToCart('{{ key }}', '{{ item.name }}', {{ item.price }})">Добавить в корзину</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="cart">
+            <h2>Корзина</h2>
+            <ul id="cart-items">
+                </ul>
+            <p>Итого: <span id="total">0</span>₽</p>
+            <button onclick="checkout()">Оформить заказ</button>
+        </div>
+        </div>
+
+    ---
+
+    <section id="contacts">
+        <h2>Наши адреса и контакты</h2>
+        <div class="contact-info">
+            <div class="contact-card">
+                <h3>ул. Ленинградская, 23/2</h3>
+                <p>г. Асбест</p>
+                <p>Телефон: +7 (999) 123-45-67</p>
+            </div>
+            <div class="email-info">
+                <p>Email: info@coffee-s.com</p>
+            </div>
+        </div>
+    </section>
+
+    ---
+
+    <section id="reviews">
+        <h2>Отзывы наших клиентов</h2>
+        <div class="reviews-container">
+            <div class="review-card">
+                <p>"Отличный кофе! Быстро и вкусно."</p>
+                <p><strong>- Мария</strong></p>
+            </div>
+            <div class="review-card">
+                <p>"Очень удобный сайт, заказы проходят без проблем."</p>
+                <p><strong>- Алексей</strong></p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="toast">Добавлено в корзину!</div>
+
+<script>
+    let cart = {};
+
+    function showToast(){
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(()=>{
+            toast.style.display = 'none';
+        }, 1200);
+    }
+
+    function addToCart(id, name, price){
+        if(cart[id]) cart[id].quantity++;
+        else cart[id] = {name:name, price:price, quantity:1};
+        renderCart();
+        showToast();
+    }
+
+    function renderCart(){
+        const ul = document.getElementById('cart-items');
+        ul.innerHTML = '';
+        let total = 0;
+        for(let id in cart){
+            const item = cart[id];
+            total += item.price * item.quantity;
+            // Убрана кнопка "❌" для более чистого макета, но в рабочем коде ее лучше оставить
+            ul.innerHTML += `<li>${item.name} x ${item.quantity} (${item.price * item.quantity}₽) <button onclick="removeItem('${id}')" style="background-color: transparent; color: black; padding: 0 5px; width: auto; margin-top: 0;">❌</button></li>`;
+        }
+        document.getElementById('total').innerText = total;
+
+        // Также обновляем статус кнопки "Оформить заказ" в корзине
+        const checkoutButton = document.querySelector('#cart button');
+        const cartTotal = document.getElementById('total').innerText;
+        checkoutButton.innerText = 'Оформить заказ';
+
+        // Добавление "Итого: 0₽"
+        if(Object.keys(cart).length === 0){
+             document.getElementById('cart-items').innerHTML = '<li>Корзина пуста</li>';
+             document.getElementById('total').innerText = '0';
+             // Визуальное изменение кнопки при пустой корзине, как на макете
+             checkoutButton.style.backgroundColor = '#dc3545';
+             checkoutButton.innerText = 'Оформить заказ';
+        } else {
+             checkoutButton.style.backgroundColor = '#dc3545';
+        }
+    }
+
+    function removeItem(id){
+        delete cart[id];
+        renderCart();
+    }
+
+    function checkout(){
+        if(Object.keys(cart).length === 0){
+            alert("Корзина пуста!");
+            return;
+        }
+
+        // Вместо fetch, просто alert для примера, так как бэкенд не предоставлен
+        alert("Заказ оформлен! Спасибо за покупку.");
+        cart = {};
+        renderCart();
+    }
+
+    // Инициализация корзины при загрузке страницы
+    window.onload = renderCart;
+</script>
+</body>
+</html>
